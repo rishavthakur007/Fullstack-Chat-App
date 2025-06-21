@@ -4,24 +4,31 @@ import messageRoutes from "./routes/message.route.js";
 import dotenv from "dotenv";
 import path from "path";
 import cookieParser from "cookie-parser";
-import {connectDB} from "./lib/db.js"
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import { connectDB } from "./lib/db.js";
 import cors from "cors";
 import { app, server } from "./lib/socket.js";
 
 dotenv.config();
+
+// Resolve __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const PORT = process.env.PORT;
 
 app.use(cookieParser());
 app.use(express.json());
-//app.use(express.urlencoded({ extended: true })); // For URL-encoded data
-app.use(cors({
+app.use(
+  cors({
     origin: "http://localhost:5173",
-    credentials: true
-}))
+    credentials: true,
+  })
+);
 
-
-app.use("/api/auth",authRoutes);
-app.use("/api/messages",messageRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../Frontend/dist")));
@@ -31,7 +38,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-server.listen(PORT,()=>{
-    console.log("Server is running at Port:",PORT);
-    connectDB();
-})  
+server.listen(PORT, () => {
+  console.log("Server is running at Port:", PORT);
+  connectDB();
+});
